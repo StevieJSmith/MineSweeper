@@ -70,6 +70,7 @@ public class Game implements ActionListener {
 				buttonPanel.add(buttons[i][j]);
 				buttons[i][j].setFont(new Font("Monospaced", Font.BOLD, 10));
 				buttons[i][j].setText("");
+				buttons[i][j].setBackground(new Color(50,50,50));
 				buttons[i][j].setFocusable(false);
 				buttons[i][j].addActionListener(this);
 			}
