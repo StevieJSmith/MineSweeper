@@ -22,8 +22,8 @@ public class Game implements ActionListener {
 
 		random = new Random();
 		int count = 0;
-		boardSize = 6;
-		bombAmount = 10;
+		boardSize = 9;
+		bombAmount = 20;
 		bombCoordinates = new ArrayList<>();
 
 		// bomb position generation (loop till the bomb amount is reached)
@@ -61,8 +61,8 @@ public class Game implements ActionListener {
 		textField.setAlignmentX(JLabel.CENTER);
 		textField.setAlignmentY(JLabel.CENTER);
 		textField.setFont(new Font("Dialog", Font.BOLD, 20));
-		textField.setForeground(Color.GREEN);
-		textField.setText("Watch out sweeper, there are " + bombAmount + " Bombs");
+		textField.setForeground(new Color(255,165,0));
+		textField.setText("Watch out sweeper, there are " + bombAmount + " Bombs!!!");
 
 		numOfMines = new int[boardSize][boardSize];
 		buttons = new JButton[boardSize][boardSize];
@@ -74,6 +74,7 @@ public class Game implements ActionListener {
 				buttons[i][j].setFont(new Font("Monospaced", Font.BOLD, 10));
 				buttons[i][j].setText("");
 				buttons[i][j].setBackground(new Color(50,50,50));
+				buttons[i][j].setForeground(new Color(180, 180,180));
 				buttons[i][j].setFocusable(false);
 				buttons[i][j].addActionListener(this);
 			}
@@ -82,7 +83,7 @@ public class Game implements ActionListener {
 		textPanel.add(textField);
 		gameFrame.add(textPanel, BorderLayout.NORTH); // assign 'textPanel' to the north of the Frame!
 		gameFrame.add(buttonPanel);
-		gameFrame.setSize(600,600);
+		gameFrame.setSize(850,850);
 		gameFrame.revalidate();
 		gameFrame.setLocationRelativeTo(null); // centers the frame in the middle of the screen
 		gameFrame.setVisible(true);
@@ -101,26 +102,27 @@ public class Game implements ActionListener {
 				boolean changed = false;
 				int mineTotal = 0;
 
-				for(int q = 0; q < bombCoordinates.size(); q++) { // loop through all mine positions
+				for (Point bombCoordinate : bombCoordinates) { // loop through all mine positions
 
-					if(j == bombCoordinates.get(q).x && i == bombCoordinates.get(q).y) { //
+					if (j == bombCoordinate.x && i == bombCoordinate.y) { //
 
-						numOfMines[i][j] = boardSize+1; // set mines to be 1 larger than the board size
+						numOfMines[i][j] = 99; // sets mines to 99
 						changed = true;
+						break;
 					}
 				}
 
 				if(!changed) { // if it was not a mine, calculate how many mines are around
 
-					for(int g = 0; g < bombCoordinates.size(); g++) { // positions around the location
-						if((j+1 == bombCoordinates.get(g).x && i+1 == bombCoordinates.get(g).y) // SE
-						|| (j-1 == bombCoordinates.get(g).x && i-1 == bombCoordinates.get(g).y) // NW
-						|| (j+1 == bombCoordinates.get(g).x && i == bombCoordinates.get(g).y) // 
-						|| (j == bombCoordinates.get(g).x && i+1 == bombCoordinates.get(g).y)
-						|| (j-1 == bombCoordinates.get(g).x && i == bombCoordinates.get(g).y)
-						|| (j == bombCoordinates.get(g).x && i-1 == bombCoordinates.get(g).y)
-						|| (j+1 == bombCoordinates.get(g).x && i-1 == bombCoordinates.get(g).y)
-						|| (j-1 == bombCoordinates.get(g).x && i+1 == bombCoordinates.get(g).y)) {
+					for (Point bombCoordinate : bombCoordinates) { // positions around the location
+						if ((j + 1 == bombCoordinate.x && i + 1 == bombCoordinate.y) // South East
+								|| (j - 1 == bombCoordinate.x && i - 1 == bombCoordinate.y) // North West
+								|| (j + 1 == bombCoordinate.x && i == bombCoordinate.y)  // etc ...
+								|| (j == bombCoordinate.x && i + 1 == bombCoordinate.y)
+								|| (j - 1 == bombCoordinate.x && i == bombCoordinate.y)
+								|| (j == bombCoordinate.x && i - 1 == bombCoordinate.y)
+								|| (j + 1 == bombCoordinate.x && i - 1 == bombCoordinate.y)
+								|| (j - 1 == bombCoordinate.x && i + 1 == bombCoordinate.y)) {
 							mineTotal++;
 						}
 						numOfMines[i][j] = mineTotal;
@@ -128,11 +130,63 @@ public class Game implements ActionListener {
 				}
 			}
 		}
-		for(int a = 0; a < numOfMines.length; a++) {
-			for(int b = 0; b < numOfMines.length; b++) {
-				System.out.print(numOfMines[a][b]+" ");
+		for (int[] numOfMine : numOfMines) {
+			for (int b = 0; b < numOfMines.length; b++) {
+				System.out.print(numOfMine[b] + " ");
 			}
 			System.out.println();
+		}
+	}
+
+	public void check(int x, int y) { // displays what is at the position clicked on
+
+		boolean isGameOver = false;
+
+		if(numOfMines[x][y] == 99) { // bomb is clicked ... oops :(
+			buttons[x][y].setText("BANG!!!");
+			gameOver(false);
+			isGameOver = true;
+		}
+
+		if(!isGameOver) { // if game is not over
+			buttons[x][y].setText(String.valueOf(numOfMines[x][y]));
+
+			isWinner();
+
+		}
+	}
+
+	public void gameOver(boolean winner) {
+
+		if(winner) {
+			textField.setForeground(Color.GREEN);
+			textField.setText("You Won!");
+		} else {
+			textField.setForeground(Color.RED);
+			textField.setText("Game Over!");
+		}
+
+		for(int i = 0; i < buttons.length; i++) {
+			for(int j = 0; j < buttons.length; j++) { // loop through and disable the board
+				buttons[i][j].setEnabled(false);
+
+			}
+		}
+	}
+
+	public void isWinner() {
+		int spaces = 0;
+
+		for(int i = 0; i < buttons.length; i++) {
+			for(int j = 0; j < buttons.length; j++) { // loop through and disable the board
+				if(buttons[i][j].getText().isEmpty()) {
+					spaces++; // increases for all remaining buttons
+				}
+
+			}
+		}
+		if(spaces == bombAmount) { // if the remaining spaces count equal the bomb count then the player wins
+			gameOver(true);
 		}
 	}
 
@@ -142,7 +196,7 @@ public class Game implements ActionListener {
 		for(int i = 0; i < buttons.length; i++){
 			for(int j = 0; j < buttons.length; j++){
 				if(e.getSource() == buttons[i][j]) {
-					System.out.println("Clicked!!!");
+					check(i,j);
 				}
 			}
 		}
