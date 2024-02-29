@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class Game {
 
-	private int boardSize; // board size
+	private int boardSize; // size of the game board
 	private int bombAmount; // amount of bombs on board
 	private ArrayList<Point> bombCoordinates = new ArrayList<>(); // bomb's x & y positions
 	private Random random;
