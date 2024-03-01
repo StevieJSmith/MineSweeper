@@ -10,21 +10,31 @@ public class Game implements ActionListener {
 	private int boardSize; // size of the game board
 	private int bombAmount; // amount of bombs on board
 	private ArrayList<Point> bombCoordinates; // bomb's x & y positions
+	Point zeroCoordinate;
+	Point lastCheckCoordinate;
+	private boolean isZero;
+
 	private Random random;
 	private JFrame gameFrame;
 	private JPanel textPanel;
+	private JPanel dropdownPanel;
 	private JPanel buttonPanel;
 	private JButton[][] buttons; // Multidimensional Array of buttons
 	private JLabel textField;
+
 	int[][] numOfMines; // store the number of mines around a position
+
 
 	public Game() {
 
 		random = new Random();
 		int count = 0;
-		boardSize = 9;
-		bombAmount = 20;
+		isZero = false;
+		boardSize = 6;
+		bombAmount = 10;
 		bombCoordinates = new ArrayList<>();
+		lastCheckCoordinate = new Point(boardSize+1, boardSize+1);
+		zeroCoordinate = new Point();
 
 		// bomb position generation (loop till the bomb amount is reached)
 		while(bombCoordinates.size() < bombAmount) {
@@ -47,8 +57,6 @@ public class Game implements ActionListener {
 		gameFrame.setVisible(true); // display frame when instance of game is called
 		gameFrame.setLayout(new BorderLayout());
 
-		System.out.println(bombCoordinates);
-
 		textPanel = new JPanel(); // instance of JPanel
 		textPanel.setVisible(true);
 		textPanel.setBackground(new Color(50,50,50));
@@ -58,20 +66,25 @@ public class Game implements ActionListener {
 		buttonPanel.setLayout(new GridLayout(boardSize,boardSize)); // ? x ? in a grid design
 
 		textField = new JLabel();
-		textField.setAlignmentX(JLabel.CENTER);
-		textField.setAlignmentY(JLabel.CENTER);
-		textField.setFont(new Font("Dialog", Font.BOLD, 20));
+		textField.setFont(new Font("Dialog", Font.BOLD, 26));
 		textField.setForeground(new Color(255,165,0));
 		textField.setText("Watch out sweeper, there are " + bombAmount + " Bombs!!!");
+
+		dropdownPanel = new JPanel();
+		dropdownPanel.setVisible(true);
+		dropdownPanel.setBackground(new Color(50,50,50));
+
+
+
 
 		numOfMines = new int[boardSize][boardSize];
 		buttons = new JButton[boardSize][boardSize];
 
-		for(int i = 0; i < buttons.length; i++){
+		for(int i = 0; i < buttons.length; i++){ // create buttons
 			for(int j = 0; j < buttons.length; j++){
 				buttons[i][j] = new JButton(); // current button
 				buttonPanel.add(buttons[i][j]);
-				buttons[i][j].setFont(new Font("Monospaced", Font.BOLD, 10));
+				buttons[i][j].setFont(new Font("Monospaced", Font.BOLD, 16));
 				buttons[i][j].setText("");
 				buttons[i][j].setBackground(new Color(50,50,50));
 				buttons[i][j].setForeground(new Color(180, 180,180));
@@ -82,6 +95,9 @@ public class Game implements ActionListener {
 
 		textPanel.add(textField);
 		gameFrame.add(textPanel, BorderLayout.NORTH); // assign 'textPanel' to the north of the Frame!
+
+		gameFrame.add(dropdownPanel, BorderLayout.SOUTH);
+		gameFrame.add(dropdownPanel);
 		gameFrame.add(buttonPanel);
 		gameFrame.setSize(850,850);
 		gameFrame.revalidate();
@@ -94,7 +110,6 @@ public class Game implements ActionListener {
 
 	}
 
-
 	public void getMines() {
 		for(int i = 0; i < numOfMines.length; i++){ // current coordinates (x,y)
 			for(int j = 0; j < numOfMines.length; j++){
@@ -105,7 +120,8 @@ public class Game implements ActionListener {
 				for (Point bombCoordinate : bombCoordinates) { // loop through all mine positions
 
 					if (j == bombCoordinate.x && i == bombCoordinate.y) { //
-
+						buttons[i][j].setText("X");
+						buttons[i][j].setForeground(new Color(50,50,50));
 						numOfMines[i][j] = 99; // sets mines to 99
 						changed = true;
 						break;
@@ -125,7 +141,7 @@ public class Game implements ActionListener {
 								|| (j - 1 == bombCoordinate.x && i + 1 == bombCoordinate.y)) {
 							mineTotal++;
 						}
-						numOfMines[i][j] = mineTotal;
+						numOfMines[i][j] = mineTotal; // give each space a value
 					}
 				}
 			}
@@ -143,13 +159,23 @@ public class Game implements ActionListener {
 		boolean isGameOver = false;
 
 		if(numOfMines[x][y] == 99) { // bomb is clicked ... oops :(
-			buttons[x][y].setText("BANG!!!");
 			gameOver(false);
 			isGameOver = true;
 		}
 
 		if(!isGameOver) { // if game is not over
-			buttons[x][y].setText(String.valueOf(numOfMines[x][y]));
+
+			if(numOfMines[x][y] == 0) { // if zero spread until bombs are discovered
+				zeroCoordinate.setLocation(x,y);
+
+				isZero = true;
+				display();
+
+			}else { // not a zero, displays its own value
+				displayNumbers(x,y);
+			}
+
+			displayNumbers(x,y);
 
 			isWinner();
 
@@ -185,11 +211,19 @@ public class Game implements ActionListener {
 
 			}
 		}
-		if(spaces == bombAmount) { // if the remaining spaces count equal the bomb count then the player wins
+		if(spaces == 0) { // if the remaining spaces count equal the bomb count then the player wins
 			gameOver(true);
 		}
 	}
 
+	public void displayNumbers(int x, int y) { // after clicking a non-mine space, the specific number will appear depending on bomb location
+		if(numOfMines[x][y] < 99) {
+			buttons[x][y].setForeground(new Color(255, 165, 0));
+			buttons[x][y].setBackground((new Color(70, 70, 70)));
+			buttons[x][y].setText(String.valueOf(numOfMines[x][y]));
+			buttons[x][y].setEnabled(false);
+		}
+	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -200,6 +234,109 @@ public class Game implements ActionListener {
 				}
 			}
 		}
+	}
+
+	public void display() {
+
+		if(isZero) {
+			if((zeroCoordinate.y - 1) >= 0) { // set positions around the zero to their number if they are inside the board and not a mine (99 aka > boardSize)
+				displayNumbers(zeroCoordinate.x, zeroCoordinate.y-1); // reveal the number
+			}
+			if((zeroCoordinate.y + 1) < boardSize) {
+				displayNumbers(zeroCoordinate.x, zeroCoordinate.y+1);
+			}
+			if((zeroCoordinate.x - 1) >= 0) {
+				displayNumbers(zeroCoordinate.x-1, zeroCoordinate.y);
+			}
+			if((zeroCoordinate.x + 1) < boardSize) {
+				displayNumbers(zeroCoordinate.x+1, zeroCoordinate.y);
+			}
+			if((zeroCoordinate.x - 1)  >= 0 && (zeroCoordinate.y - 1) >= 0) {
+				displayNumbers(zeroCoordinate.x-1, zeroCoordinate.y-1);
+			}
+			if((zeroCoordinate.x + 1) < boardSize && (zeroCoordinate.y + 1) < boardSize) {
+				displayNumbers(zeroCoordinate.x+1, zeroCoordinate.y+1);
+			}
+			if((zeroCoordinate.x - 1) >= 0 && (zeroCoordinate.y + 1) < boardSize) {
+				displayNumbers(zeroCoordinate.x-1, zeroCoordinate.y+1);
+			}
+			if((zeroCoordinate.x + 1) < boardSize && (zeroCoordinate.y - 1) >= 0) {
+				displayNumbers(zeroCoordinate.x+1, zeroCoordinate.y-1);
+
+				isZero = false;
+				display(); // calls itself to trigger the else
+			}
+		} else {
+
+			for(int i = 0; i < buttons.length; i++) { // loop through all spaces
+				for(int j = 0; j < buttons.length; j++) {
+
+					if(buttons[i][j].getText().equals("0")) {
+						if(i-1 >= 0) {
+							if(buttons[i - 1][j].getText().isEmpty()) {
+								lastCheckCoordinate.setLocation(i,j);
+							}
+						}
+
+						if(i+1 < boardSize) {
+							if(buttons[i + 1][j].getText().isEmpty()) {
+								lastCheckCoordinate.setLocation(i,j);
+							}
+						}
+
+						if(j-1 >= 0) {
+							if(buttons[i][j - 1].getText().isEmpty()) {
+								lastCheckCoordinate.setLocation(i,j);
+							}
+						}
+
+						if(j+1 < boardSize) {
+							if(buttons[i][j + 1].getText().isEmpty()) {
+								lastCheckCoordinate.setLocation(i,j);
+							}
+						}
+
+						if(i-1 >= 0 && j-1 >= 0) {
+							if(buttons[i - 1][j - 1].getText().isEmpty()) {
+								lastCheckCoordinate.setLocation(i,j);
+							}
+						}
+
+						if(i+1 < boardSize && j+1 < boardSize) {
+							if(buttons[i + 1][j + 1].getText().isEmpty()) {
+								lastCheckCoordinate.setLocation(i,j);
+							}
+						}
+
+						if(i+1 < boardSize && j-1 >= 0) {
+							if(buttons[i + 1][j - 1].getText().isEmpty()) {
+								lastCheckCoordinate.setLocation(i,j);
+							}
+						}
+
+						if(i-1 >= 0 && j+1 < boardSize) {
+							if(buttons[i - 1][j + 1].getText().isEmpty()) {
+								lastCheckCoordinate.setLocation(i,j);
+							}
+						}
+					}
+				}
+			}
+
+		}
+
+		if(lastCheckCoordinate.x < boardSize + 1 && lastCheckCoordinate.y < boardSize + 1) { // less than default values
+
+			zeroCoordinate.setLocation(lastCheckCoordinate);
+
+			isZero = true; // make display run the if statement again!
+
+			lastCheckCoordinate.setLocation(boardSize+1,boardSize+1); // reset original values
+
+			display(); // iterates through the loop again (chain reaction when zeros are found on the board)
+
+		}
+
 	}
 
 }
