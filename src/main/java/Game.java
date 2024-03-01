@@ -21,9 +21,10 @@ public class Game implements ActionListener {
 	private JPanel buttonPanel;
 	private JButton[][] buttons; // Multidimensional Array of buttons
 	private JLabel textField;
-
+	private JLabel dropdownText;
 	int[][] numOfMines; // store the number of mines around a position
-
+	String[] choices = { "Easy", "Medium", "Hard" };
+	private JComboBox dropdownBox;
 
 	public Game() {
 
@@ -74,7 +75,14 @@ public class Game implements ActionListener {
 		dropdownPanel.setVisible(true);
 		dropdownPanel.setBackground(new Color(50,50,50));
 
+		dropdownText = new JLabel("Select a difficulty!");;
+		dropdownText.setVisible(true);
 
+		dropdownBox = new JComboBox(choices);
+		dropdownBox.setMaximumSize(dropdownBox.getPreferredSize());
+		dropdownBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+		dropdownBox.setSelectedIndex(2);
+		dropdownBox.addActionListener(this);
 
 
 		numOfMines = new int[boardSize][boardSize];
@@ -95,7 +103,8 @@ public class Game implements ActionListener {
 
 		textPanel.add(textField);
 		gameFrame.add(textPanel, BorderLayout.NORTH); // assign 'textPanel' to the north of the Frame!
-
+		//dropdownPanel.add(dropdownBox);
+		dropdownPanel.add(dropdownText);
 		gameFrame.add(dropdownPanel, BorderLayout.SOUTH);
 		gameFrame.add(dropdownPanel);
 		gameFrame.add(buttonPanel);
