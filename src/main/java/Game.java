@@ -15,24 +15,22 @@ public class Game implements ActionListener {
 	private boolean isZero;
 
 	private Random random;
-	private JFrame gameFrame;
+	private final JFrame gameFrame;
 	private JPanel textPanel;
 	private JPanel dropdownPanel;
 	private JPanel buttonPanel;
-	private JButton[][] buttons; // Multidimensional Array of buttons
-	private JLabel textField;
+	private final JButton[][] buttons; // Multidimensional Array of buttons
+	private final JLabel textField;
 	private JLabel dropdownText;
 	int[][] numOfMines; // store the number of mines around a position
-	String[] choices = { "Easy", "Medium", "Hard" };
-	private JComboBox dropdownBox;
+	String[] choices = { "Easy", "Medium", "Hard" }; // difficulty settings
+	private final JComboBox<String> dropdownBox;
 
-	public Game() {
+	public Game(int boardSize, int bombAmount) {
 
 		random = new Random();
 		int count = 0;
 		isZero = false;
-		boardSize = 6;
-		bombAmount = 10;
 		bombCoordinates = new ArrayList<>();
 		lastCheckCoordinate = new Point(boardSize+1, boardSize+1);
 		zeroCoordinate = new Point();
@@ -75,13 +73,15 @@ public class Game implements ActionListener {
 		dropdownPanel.setVisible(true);
 		dropdownPanel.setBackground(new Color(50,50,50));
 
-		dropdownText = new JLabel("Select a difficulty!");;
-		dropdownText.setVisible(true);
+		dropdownText = new JLabel("Select a difficulty:");;
+		dropdownText.setFont(new Font("Dialog", Font.BOLD, 16));
+		dropdownText.setForeground(new Color(255,165,0));
 
-		dropdownBox = new JComboBox(choices);
+
+		dropdownBox = new JComboBox<>(choices);
 		dropdownBox.setMaximumSize(dropdownBox.getPreferredSize());
 		dropdownBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-		dropdownBox.setSelectedIndex(2);
+		dropdownBox.setSelectedIndex(0);
 		dropdownBox.addActionListener(this);
 
 
@@ -103,10 +103,9 @@ public class Game implements ActionListener {
 
 		textPanel.add(textField);
 		gameFrame.add(textPanel, BorderLayout.NORTH); // assign 'textPanel' to the north of the Frame!
-		//dropdownPanel.add(dropdownBox);
 		dropdownPanel.add(dropdownText);
+		dropdownPanel.add(dropdownBox);
 		gameFrame.add(dropdownPanel, BorderLayout.SOUTH);
-		gameFrame.add(dropdownPanel);
 		gameFrame.add(buttonPanel);
 		gameFrame.setSize(850,850);
 		gameFrame.revalidate();
@@ -161,6 +160,7 @@ public class Game implements ActionListener {
 			}
 			System.out.println();
 		}
+		System.out.println();
 	}
 
 	public void check(int x, int y) { // displays what is at the position clicked on
@@ -236,13 +236,34 @@ public class Game implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		for(int i = 0; i < buttons.length; i++){
-			for(int j = 0; j < buttons.length; j++){
-				if(e.getSource() == buttons[i][j]) {
-					check(i,j);
+
+		if(e.getSource() == dropdownBox) {
+			if(dropdownBox.getSelectedItem() == "Easy") {
+				gameFrame.dispose();
+				new Game(6, 10);
+			} else if (dropdownBox.getSelectedItem() == "Medium") {
+				gameFrame.dispose();
+				new Game(8, 20);
+
+			} else {
+				gameFrame.dispose();
+				new Game(10, 30);
+
+			}
+		}else {
+
+			for (int i = 0; i < buttons.length; i++) {
+				for (int j = 0; j < buttons.length; j++) {
+					if (e.getSource() == buttons[i][j]) {
+						check(i, j);
+					}
 				}
 			}
 		}
+
+
+
+
 	}
 
 	public void display() {
@@ -337,15 +358,9 @@ public class Game implements ActionListener {
 		if(lastCheckCoordinate.x < boardSize + 1 && lastCheckCoordinate.y < boardSize + 1) { // less than default values
 
 			zeroCoordinate.setLocation(lastCheckCoordinate);
-
 			isZero = true; // make display run the if statement again!
-
 			lastCheckCoordinate.setLocation(boardSize+1,boardSize+1); // reset original values
-
 			display(); // iterates through the loop again (chain reaction when zeros are found on the board)
-
 		}
-
 	}
-
 }
