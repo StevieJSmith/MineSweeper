@@ -8,7 +8,6 @@ import java.util.Random;
 public class Game implements ActionListener {
 
 	private int boardSize; // size of the game board
-	private int bombAmount; // amount of bombs on board
 	private ArrayList<Point> bombCoordinates; // bomb's x & y positions
 	Point zeroCoordinate;
 	Point lastCheckCoordinate;
@@ -19,12 +18,12 @@ public class Game implements ActionListener {
 	private JPanel textPanel;
 	private JPanel dropdownPanel;
 	private JPanel buttonPanel;
-	private final JButton[][] buttons; // Multidimensional Array of buttons
-	private final JLabel textField;
+	private JButton[][] buttons; // Multidimensional Array of buttons
+	private JLabel textField;
 	private JLabel dropdownText;
 	int[][] numOfMines; // store the number of mines around a position
 	String[] choices = { "Easy", "Medium", "Hard" }; // difficulty settings
-	private final JComboBox<String> dropdownBox;
+	private JComboBox<String> dropdownBox;
 
 	public Game(int boardSize, int bombAmount) {
 
@@ -154,7 +153,7 @@ public class Game implements ActionListener {
 				}
 			}
 		}
-		for (int[] numOfMine : numOfMines) {
+		for (int[] numOfMine : numOfMines) { // Prints out board with mine positions
 			for (int b = 0; b < numOfMines.length; b++) {
 				System.out.print(numOfMine[b] + " ");
 			}
