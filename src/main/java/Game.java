@@ -10,7 +10,7 @@ import java.util.Random;
 public class Game implements ActionListener {
 
 	private int boardSize; // size of the game board
-	private ArrayList<Point> bombCoordinates; // bomb's x & y positions
+	private ArrayList<Point> mineCoordinates; // bomb's x & y positions
 	Point zeroCoordinate;
 	Point lastCheckCoordinate;
 	private boolean isZero;
@@ -28,31 +28,31 @@ public class Game implements ActionListener {
 	String[] choices = { "Easy", "Medium", "Hard" }; // difficulty settings
 	private JComboBox<String> dropdownBox;
 
-	public Game(int boardSize, int bombAmount, int difficulty) {
+	public Game(int boardSize, int mineAmount, int difficulty) {
 
 		random = new Random();
 		int count = 0;
-		int bombs = 0;
+		int mines = 0;
 		isZero = false;
-		bombCoordinates = new ArrayList<>();
+		mineCoordinates = new ArrayList<>();
 		lastCheckCoordinate = new Point(boardSize+1, boardSize+1);
 		zeroCoordinate = new Point();
 
 		// bomb position generation (loop till the bomb amount is reached)
-		while(bombCoordinates.size() < bombAmount) {
+		while(mineCoordinates.size() < mineAmount) {
 			int x = random.nextInt(boardSize);
 			int y = random.nextInt(boardSize);
 
 			Point newCoordinate = new Point(x,y); // new bomb position
 
-			for(Point currentCoordinate: bombCoordinates) { // loop through all current positions
+			for(Point currentCoordinate: mineCoordinates) { // loop through all current positions
 				if(newCoordinate.equals(currentCoordinate)) { // if the new bomb overlaps another bomb
 					count++;
 				}
 			}
 			if(count == 0) { // if no overlaps were found, add the new bomb position
-				bombCoordinates.add(newCoordinate);
-				bombs++;
+				mineCoordinates.add(newCoordinate);
+				mines++;
 			}
 			if(count == 10000) {
 				break;
@@ -75,7 +75,7 @@ public class Game implements ActionListener {
 		textField = new JLabel();
 		textField.setFont(new Font("Dialog", Font.BOLD, 26));
 		textField.setForeground(new Color(255,165,0));
-		textField.setText("Watch out sweeper, there are " + bombs + " Bombs!!!");
+		textField.setText("Watch out sweeper, there are " + mines + " Bombs!!!");
 
 		dropdownPanel = new JPanel();
 		dropdownPanel.setVisible(true);
@@ -93,8 +93,8 @@ public class Game implements ActionListener {
 		dropdownBox.addActionListener(this);
 
 
-		numOfMines = new int[boardSize][boardSize];
-		buttons = new JButton[boardSize][boardSize];
+		numOfMines = new int[boardSize][boardSize]; // values for each space (99 = mine)
+		buttons = new JButton[boardSize][boardSize]; // all possible spaces
 
 		for(int i = 0; i < buttons.length; i++){ // create buttons
 			for(int j = 0; j < buttons.length; j++){
@@ -112,10 +112,10 @@ public class Game implements ActionListener {
 				buttons[i][j].addMouseListener(new MouseAdapter() {
 					public void mouseClicked(MouseEvent e) {
 						if(e.getButton() == 3) {
-							if(buttons[finalI][finalJ].getText().isEmpty() || buttons[finalI][finalJ].getText().equals("X")) {
+							if(!buttons[finalI][finalJ].getText().equals("O")) { // if the space has not been flagged
 								buttons[finalI][finalJ].setForeground(new Color(180, 180,180));
 								buttons[finalI][finalJ].setText("O");
-							}else if(buttons[finalI][finalJ].getText().equals("O") && numOfMines[finalI][finalJ] == 99) {
+							}else if(buttons[finalI][finalJ].getText().equals("O") && numOfMines[finalI][finalJ] == 99) { // if the space is flagged already and is a mine
 								buttons[finalI][finalJ].setForeground(new Color(50,50,50));
 								buttons[finalI][finalJ].setText("X");
 							} else {
@@ -150,7 +150,7 @@ public class Game implements ActionListener {
 				boolean changed = false;
 				int mineTotal = 0;
 
-				for (Point bombCoordinate : bombCoordinates) { // loop through all mine positions
+				for (Point bombCoordinate : mineCoordinates) { // loop through all mine positions
 
 					if (j == bombCoordinate.x && i == bombCoordinate.y) { //
 						buttons[i][j].setText("X");
@@ -163,7 +163,7 @@ public class Game implements ActionListener {
 
 				if(!changed) { // if it was not a mine, calculate how many mines are around
 
-					for (Point bombCoordinate : bombCoordinates) { // positions around the location
+					for (Point bombCoordinate : mineCoordinates) { // positions around the location
 						if ((j + 1 == bombCoordinate.x && i + 1 == bombCoordinate.y) // South East
 								|| (j - 1 == bombCoordinate.x && i - 1 == bombCoordinate.y) // North West
 								|| (j + 1 == bombCoordinate.x && i == bombCoordinate.y)  // etc ...
@@ -181,7 +181,7 @@ public class Game implements ActionListener {
 		}
 		for (int[] numOfMine : numOfMines) { // Prints out board with mine positions
 			for (int b = 0; b < numOfMines.length; b++) {
-				System.out.print(numOfMine[b] + " ");
+				System.out.print(numOfMine[b] + "     ");
 			}
 			System.out.println();
 		}
@@ -262,7 +262,7 @@ public class Game implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
+		// Load chosen difficulty depending on dropdown box choice
 		if(e.getSource() == dropdownBox) {
 			if(dropdownBox.getSelectedItem() == "Easy") {
 				gameFrame.dispose();
@@ -280,7 +280,7 @@ public class Game implements ActionListener {
 
 			}
 		}else {
-
+			// Display position clicked on
 			for (int i = 0; i < buttons.length; i++) {
 				for (int j = 0; j < buttons.length; j++) {
 					if (e.getSource() == buttons[i][j]) {
