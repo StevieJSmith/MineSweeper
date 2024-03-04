@@ -10,7 +10,7 @@ import java.util.Random;
 public class Game implements ActionListener {
 
 	private int boardSize; // size of the game board
-	private ArrayList<Point> mineCoordinates; // bomb's x & y positions
+	ArrayList<Point> mineCoordinates; // bomb's x & y positions
 	Point zeroCoordinate;
 	Point lastCheckCoordinate;
 	private boolean isZero;
@@ -21,7 +21,7 @@ public class Game implements ActionListener {
 	private JPanel textPanel;
 	private JPanel dropdownPanel;
 	private JPanel buttonPanel;
-	private JButton[][] buttons; // Multidimensional Array of buttons
+	 JButton[][] buttons; // Multidimensional Array of buttons
 	private JLabel textField;
 	private JLabel dropdownText;
 	int[][] numOfMines; // store the number of mines around a position
@@ -150,9 +150,9 @@ public class Game implements ActionListener {
 				boolean changed = false;
 				int mineTotal = 0;
 
-				for (Point bombCoordinate : mineCoordinates) { // loop through all mine positions
+				for (Point mineCoordinate : mineCoordinates) { // loop through all mine positions
 
-					if (j == bombCoordinate.x && i == bombCoordinate.y) { //
+					if (j == mineCoordinate.x && i == mineCoordinate.y) { //
 						buttons[i][j].setText("X");
 						buttons[i][j].setForeground(new Color(50,50,50));
 						numOfMines[i][j] = 99; // sets mines to 99
@@ -163,16 +163,19 @@ public class Game implements ActionListener {
 
 				if(!changed) { // if it was not a mine, calculate how many mines are around
 
-					for (Point bombCoordinate : mineCoordinates) { // positions around the location
-						if ((j + 1 == bombCoordinate.x && i + 1 == bombCoordinate.y) // South East
-								|| (j - 1 == bombCoordinate.x && i - 1 == bombCoordinate.y) // North West
-								|| (j + 1 == bombCoordinate.x && i == bombCoordinate.y)  // etc ...
-								|| (j == bombCoordinate.x && i + 1 == bombCoordinate.y)
-								|| (j - 1 == bombCoordinate.x && i == bombCoordinate.y)
-								|| (j == bombCoordinate.x && i - 1 == bombCoordinate.y)
-								|| (j + 1 == bombCoordinate.x && i - 1 == bombCoordinate.y)
-								|| (j - 1 == bombCoordinate.x && i + 1 == bombCoordinate.y)) {
-							mineTotal++;
+
+
+					for (Point mineCoordinate : mineCoordinates) { // positions around the location
+						for(int x = -1; x < 2; x++) {
+							for(int y = -1; y < 2; y++) {
+								if(x == 0 && y == 0) {
+									continue;
+								}
+								if(j + x == mineCoordinate.x && i + y == mineCoordinate.y ) {
+									mineTotal++;
+
+								}
+							}
 						}
 						numOfMines[i][j] = mineTotal; // give each space a value
 					}
@@ -192,7 +195,7 @@ public class Game implements ActionListener {
 
 		boolean isGameOver = false;
 
-		if(numOfMines[x][y] == 99) { // bomb is clicked ... oops :(
+		if(!buttons[x][y].equals("O") && numOfMines[x][y] == 99) { // bomb is clicked ... oops :(
 			gameOver(false);
 			buttons[x][y].setText("X"); // if a mine is flagged and clicked the text will convert from a flag to a mine!
 			isGameOver = true;
@@ -206,8 +209,6 @@ public class Game implements ActionListener {
 				isZero = true;
 				display();
 
-			}else { // not a zero, displays its own value
-				displayNumbers(x,y);
 			}
 
 			displayNumbers(x,y);
@@ -252,7 +253,7 @@ public class Game implements ActionListener {
 	}
 
 	public void displayNumbers(int x, int y) { // after clicking a non-mine space, the specific number will appear depending on bomb location
-		if(numOfMines[x][y] < 99) {
+		if(buttons[x][y].getText().isEmpty()) { // prevents bombs and flagged being displayed
 			buttons[x][y].setForeground(new Color(255, 165, 0));
 			buttons[x][y].setBackground((new Color(70, 70, 70)));
 			buttons[x][y].setText(String.valueOf(numOfMines[x][y]));
@@ -298,33 +299,15 @@ public class Game implements ActionListener {
 	public void display() {
 
 		if(isZero) {
-			if((zeroCoordinate.y - 1) >= 0) { // set positions around the zero to their number if they are inside the board and not a mine (99 aka > boardSize)
-				displayNumbers(zeroCoordinate.x, zeroCoordinate.y-1); // reveal the number
+			for(int x = -1;  x < 2; x++) {
+				for(int y = -1; y < 2; y++) { // check if space is in bounds first
+					if((zeroCoordinate.x+x) > 0 && (zeroCoordinate.y+y) > 0 &&
+							(zeroCoordinate.x+x) < boardSize && (zeroCoordinate.y+y < boardSize)  )
+						displayNumbers(zeroCoordinate.x + x, zeroCoordinate.y + y);
+				}
 			}
-			if((zeroCoordinate.y + 1) < boardSize) {
-				displayNumbers(zeroCoordinate.x, zeroCoordinate.y+1);
-			}
-			if((zeroCoordinate.x - 1) >= 0) {
-				displayNumbers(zeroCoordinate.x-1, zeroCoordinate.y);
-			}
-			if((zeroCoordinate.x + 1) < boardSize) {
-				displayNumbers(zeroCoordinate.x+1, zeroCoordinate.y);
-			}
-			if((zeroCoordinate.x - 1)  >= 0 && (zeroCoordinate.y - 1) >= 0) {
-				displayNumbers(zeroCoordinate.x-1, zeroCoordinate.y-1);
-			}
-			if((zeroCoordinate.x + 1) < boardSize && (zeroCoordinate.y + 1) < boardSize) {
-				displayNumbers(zeroCoordinate.x+1, zeroCoordinate.y+1);
-			}
-			if((zeroCoordinate.x - 1) >= 0 && (zeroCoordinate.y + 1) < boardSize) {
-				displayNumbers(zeroCoordinate.x-1, zeroCoordinate.y+1);
-			}
-			if((zeroCoordinate.x + 1) < boardSize && (zeroCoordinate.y - 1) >= 0) {
-				displayNumbers(zeroCoordinate.x+1, zeroCoordinate.y-1);
-
 				isZero = false;
 				display(); // calls itself to trigger the else
-			}
 		} else {
 
 			for(int i = 0; i < buttons.length; i++) { // loop through all spaces
