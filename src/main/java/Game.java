@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,6 +16,7 @@ public class Game implements ActionListener {
 	private boolean isZero;
 
 	private Random random;
+
 	private final JFrame gameFrame;
 	private JPanel textPanel;
 	private JPanel dropdownPanel;
@@ -25,10 +28,11 @@ public class Game implements ActionListener {
 	String[] choices = { "Easy", "Medium", "Hard" }; // difficulty settings
 	private JComboBox<String> dropdownBox;
 
-	public Game(int boardSize, int bombAmount) {
+	public Game(int boardSize, int bombAmount, int difficulty) {
 
 		random = new Random();
 		int count = 0;
+		int bombs = 0;
 		isZero = false;
 		bombCoordinates = new ArrayList<>();
 		lastCheckCoordinate = new Point(boardSize+1, boardSize+1);
@@ -38,6 +42,7 @@ public class Game implements ActionListener {
 		while(bombCoordinates.size() < bombAmount) {
 			int x = random.nextInt(boardSize);
 			int y = random.nextInt(boardSize);
+
 			Point newCoordinate = new Point(x,y); // new bomb position
 
 			for(Point currentCoordinate: bombCoordinates) { // loop through all current positions
@@ -47,6 +52,10 @@ public class Game implements ActionListener {
 			}
 			if(count == 0) { // if no overlaps were found, add the new bomb position
 				bombCoordinates.add(newCoordinate);
+				bombs++;
+			}
+			if(count == 10000) {
+				break;
 			}
 		}
 
@@ -66,7 +75,7 @@ public class Game implements ActionListener {
 		textField = new JLabel();
 		textField.setFont(new Font("Dialog", Font.BOLD, 26));
 		textField.setForeground(new Color(255,165,0));
-		textField.setText("Watch out sweeper, there are " + bombAmount + " Bombs!!!");
+		textField.setText("Watch out sweeper, there are " + bombs + " Bombs!!!");
 
 		dropdownPanel = new JPanel();
 		dropdownPanel.setVisible(true);
@@ -80,7 +89,7 @@ public class Game implements ActionListener {
 		dropdownBox = new JComboBox<>(choices);
 		dropdownBox.setMaximumSize(dropdownBox.getPreferredSize());
 		dropdownBox.setAlignmentX(Component.CENTER_ALIGNMENT);
-		dropdownBox.setSelectedIndex(0);
+		dropdownBox.setSelectedIndex(difficulty);
 		dropdownBox.addActionListener(this);
 
 
@@ -97,6 +106,24 @@ public class Game implements ActionListener {
 				buttons[i][j].setForeground(new Color(180, 180,180));
 				buttons[i][j].setFocusable(false);
 				buttons[i][j].addActionListener(this);
+
+				int finalI = i;
+				int finalJ = j;
+				buttons[i][j].addMouseListener(new MouseAdapter() {
+					public void mouseClicked(MouseEvent e) {
+						if(e.getButton() == 3) {
+							if(buttons[finalI][finalJ].getText().isEmpty() || buttons[finalI][finalJ].getText().equals("X")) {
+								buttons[finalI][finalJ].setForeground(new Color(180, 180,180));
+								buttons[finalI][finalJ].setText("O");
+							}else if(buttons[finalI][finalJ].getText().equals("O") && numOfMines[finalI][finalJ] == 99) {
+								buttons[finalI][finalJ].setForeground(new Color(50,50,50));
+								buttons[finalI][finalJ].setText("X");
+							} else {
+								buttons[finalI][finalJ].setText("");
+							}
+						}
+					}
+				});
 			}
 		}
 
@@ -109,7 +136,6 @@ public class Game implements ActionListener {
 		gameFrame.setSize(850,850);
 		gameFrame.revalidate();
 		gameFrame.setLocationRelativeTo(null); // centers the frame in the middle of the screen
-		gameFrame.setVisible(true);
 
 		getMines();
 
@@ -168,6 +194,7 @@ public class Game implements ActionListener {
 
 		if(numOfMines[x][y] == 99) { // bomb is clicked ... oops :(
 			gameOver(false);
+			buttons[x][y].setText("X"); // if a mine is flagged and clicked the text will convert from a flag to a mine!
 			isGameOver = true;
 		}
 
@@ -239,14 +266,17 @@ public class Game implements ActionListener {
 		if(e.getSource() == dropdownBox) {
 			if(dropdownBox.getSelectedItem() == "Easy") {
 				gameFrame.dispose();
-				new Game(6, 10);
+				new Game(6, 10, 0);
+				dropdownBox.setSelectedIndex(0);
 			} else if (dropdownBox.getSelectedItem() == "Medium") {
 				gameFrame.dispose();
-				new Game(8, 20);
+				new Game(8, 20, 1);
+				dropdownBox.setSelectedIndex(1);
 
 			} else {
 				gameFrame.dispose();
-				new Game(10, 30);
+				new Game(10, 30, 2);
+				dropdownBox.setSelectedIndex(2);
 
 			}
 		}else {
