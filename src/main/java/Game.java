@@ -193,9 +193,9 @@ public class Game implements ActionListener {
 
 		boolean isGameOver = false;
 
-		if(!buttons[x][y].equals("O") && numOfMines[x][y] == 99) { // bomb is clicked ... oops :(
-			gameOver(false);
+		if(!buttons[x][y].getText().equals("O") && numOfMines[x][y] == 99) { // bomb is clicked ... oops :(
 			buttons[x][y].setText("X"); // if a mine is flagged and clicked the text will convert from a flag to a mine!
+			gameOver(false);
 			isGameOver = true;
 		}
 
@@ -209,9 +209,11 @@ public class Game implements ActionListener {
 
 			}
 
-			displayNumbers(x,y);
+			if(!buttons[x][y].getText().equals("O")) { // if not tagged and does not equal a mine or 0
+				displayNumbers(x,y);
+			}
 
-			isWinner();
+			isWinner(); // check if you have won
 
 		}
 	}
