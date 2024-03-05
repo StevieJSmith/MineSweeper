@@ -12,7 +12,6 @@ public class Game implements ActionListener {
 	private int boardSize; // size of the game board
 	ArrayList&lt;Point&gt; mineCoordinates; // bomb's x &amp; y positions
 	Point zeroCoordinate;
-	Point lastCheckCoordinate;
 	private boolean isZero;
 
 	private Random random;
@@ -25,267 +24,266 @@ public class Game implements ActionListener {
 	private JLabel textField;
 	private JLabel dropdownText;
 	int[][] numOfMines; // store the number of mines around a position
-<span class="fc" id="L28">	String[] choices = { &quot;Easy&quot;, &quot;Medium&quot;, &quot;Hard&quot; }; // difficulty settings</span>
+<span class="fc" id="L27">	String[] choices = { &quot;Easy&quot;, &quot;Medium&quot;, &quot;Hard&quot; }; // difficulty settings</span>
 	private JComboBox&lt;String&gt; dropdownBox;
 
-<span class="fc" id="L31">	public Game(int boardSize, int mineAmount, int difficulty) {</span>
+<span class="fc" id="L30">	public Game(int boardSize, int mineAmount, int difficulty) {</span>
 
-<span class="fc" id="L33">		random = new Random();</span>
-<span class="fc" id="L34">		int count = 0;</span>
-<span class="fc" id="L35">		int mines = 0;</span>
-<span class="fc" id="L36">		isZero = false;</span>
-<span class="fc" id="L37">		mineCoordinates = new ArrayList&lt;&gt;();</span>
-<span class="fc" id="L38">		lastCheckCoordinate = new Point(boardSize+1, boardSize+1);</span>
-<span class="fc" id="L39">		zeroCoordinate = new Point();</span>
+<span class="fc" id="L32">		random = new Random();</span>
+<span class="fc" id="L33">		int count = 0;</span>
+<span class="fc" id="L34">		int mines = 0;</span>
+<span class="fc" id="L35">		isZero = false;</span>
+<span class="fc" id="L36">		mineCoordinates = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L37">		zeroCoordinate = new Point();</span>
 
 		// bomb position generation (loop till the bomb amount is reached)
-<span class="fc bfc" id="L42" title="All 2 branches covered.">		while(mineCoordinates.size() &lt; mineAmount) {</span>
-<span class="fc" id="L43">			int x = random.nextInt(boardSize);</span>
-<span class="fc" id="L44">			int y = random.nextInt(boardSize);</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">		while(mineCoordinates.size() &lt; mineAmount) {</span>
+<span class="fc" id="L41">			int x = random.nextInt(boardSize);</span>
+<span class="fc" id="L42">			int y = random.nextInt(boardSize);</span>
 
-<span class="fc" id="L46">			Point newCoordinate = new Point(x,y); // new bomb position</span>
+<span class="fc" id="L44">			Point newCoordinate = new Point(x,y); // new bomb position</span>
 
-<span class="fc bfc" id="L48" title="All 2 branches covered.">			for(Point currentCoordinate: mineCoordinates) { // loop through all current positions</span>
-<span class="fc bfc" id="L49" title="All 2 branches covered.">				if(newCoordinate.equals(currentCoordinate)) { // if the new bomb overlaps another bomb</span>
-<span class="fc" id="L50">					count++;</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">			for(Point currentCoordinate: mineCoordinates) { // loop through all current positions</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">				if(newCoordinate.equals(currentCoordinate)) { // if the new bomb overlaps another bomb</span>
+<span class="fc" id="L48">					count++;</span>
 				}
-<span class="fc" id="L52">			}</span>
-<span class="fc bfc" id="L53" title="All 2 branches covered.">			if(count == 0) { // if no overlaps were found, add the new bomb position</span>
-<span class="fc" id="L54">				mineCoordinates.add(newCoordinate);</span>
-<span class="fc" id="L55">				mines++;</span>
+<span class="fc" id="L50">			}</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">			if(count == 0) { // if no overlaps were found, add the new bomb position</span>
+<span class="fc" id="L52">				mineCoordinates.add(newCoordinate);</span>
+<span class="fc" id="L53">				mines++;</span>
 			}
-<span class="fc bfc" id="L57" title="All 2 branches covered.">			if(count == 10000) {</span>
-<span class="fc" id="L58">				break;</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">			if(count == 10000) {</span>
+<span class="fc" id="L56">				break;</span>
 			}
-<span class="fc" id="L60">		}</span>
+<span class="fc" id="L58">		}</span>
 
-<span class="fc" id="L62">		gameFrame = new JFrame(); // instance of JFrame</span>
-<span class="fc" id="L63">		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
-<span class="fc" id="L64">		gameFrame.setVisible(true); // display frame when instance of game is called</span>
-<span class="fc" id="L65">		gameFrame.setLayout(new BorderLayout());</span>
+<span class="fc" id="L60">		gameFrame = new JFrame(); // instance of JFrame</span>
+<span class="fc" id="L61">		gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="fc" id="L62">		gameFrame.setVisible(true); // display frame when instance of game is called</span>
+<span class="fc" id="L63">		gameFrame.setLayout(new BorderLayout());</span>
 
-<span class="fc" id="L67">		textPanel = new JPanel(); // instance of JPanel</span>
-<span class="fc" id="L68">		textPanel.setVisible(true);</span>
-<span class="fc" id="L69">		textPanel.setBackground(new Color(50,50,50));</span>
+<span class="fc" id="L65">		textPanel = new JPanel(); // instance of JPanel</span>
+<span class="fc" id="L66">		textPanel.setVisible(true);</span>
+<span class="fc" id="L67">		textPanel.setBackground(new Color(50,50,50));</span>
 
-<span class="fc" id="L71">		buttonPanel = new JPanel();</span>
-<span class="fc" id="L72">		buttonPanel.setVisible(true);</span>
-<span class="fc" id="L73">		buttonPanel.setLayout(new GridLayout(boardSize,boardSize)); // ? x ? in a grid design</span>
+<span class="fc" id="L69">		buttonPanel = new JPanel();</span>
+<span class="fc" id="L70">		buttonPanel.setVisible(true);</span>
+<span class="fc" id="L71">		buttonPanel.setLayout(new GridLayout(boardSize,boardSize)); // ? x ? in a grid design</span>
 
-<span class="fc" id="L75">		textField = new JLabel();</span>
-<span class="fc" id="L76">		textField.setFont(new Font(&quot;Dialog&quot;, Font.BOLD, 26));</span>
-<span class="fc" id="L77">		textField.setForeground(new Color(255,165,0));</span>
-<span class="fc" id="L78">		textField.setText(&quot;Watch out sweeper, there are &quot; + mines + &quot; Bombs!!!&quot;);</span>
+<span class="fc" id="L73">		textField = new JLabel();</span>
+<span class="fc" id="L74">		textField.setFont(new Font(&quot;Dialog&quot;, Font.BOLD, 26));</span>
+<span class="fc" id="L75">		textField.setForeground(new Color(255,165,0));</span>
+<span class="fc" id="L76">		textField.setText(&quot;Watch out sweeper, there are &quot; + mines + &quot; Bombs!!!&quot;);</span>
 
-<span class="fc" id="L80">		dropdownPanel = new JPanel();</span>
-<span class="fc" id="L81">		dropdownPanel.setVisible(true);</span>
-<span class="fc" id="L82">		dropdownPanel.setBackground(new Color(50,50,50));</span>
+<span class="fc" id="L78">		dropdownPanel = new JPanel();</span>
+<span class="fc" id="L79">		dropdownPanel.setVisible(true);</span>
+<span class="fc" id="L80">		dropdownPanel.setBackground(new Color(50,50,50));</span>
 
-<span class="fc" id="L84">		dropdownText = new JLabel(&quot;Select a difficulty:&quot;);;</span>
-<span class="fc" id="L85">		dropdownText.setFont(new Font(&quot;Dialog&quot;, Font.BOLD, 16));</span>
-<span class="fc" id="L86">		dropdownText.setForeground(new Color(255,165,0));</span>
-
-
-<span class="fc" id="L89">		dropdownBox = new JComboBox&lt;&gt;(choices);</span>
-<span class="fc" id="L90">		dropdownBox.setMaximumSize(dropdownBox.getPreferredSize());</span>
-<span class="fc" id="L91">		dropdownBox.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
-<span class="fc" id="L92">		dropdownBox.setSelectedIndex(difficulty);</span>
-<span class="fc" id="L93">		dropdownBox.addActionListener(this);</span>
+<span class="fc" id="L82">		dropdownText = new JLabel(&quot;Select a difficulty:&quot;);;</span>
+<span class="fc" id="L83">		dropdownText.setFont(new Font(&quot;Dialog&quot;, Font.BOLD, 16));</span>
+<span class="fc" id="L84">		dropdownText.setForeground(new Color(255,165,0));</span>
 
 
-<span class="fc" id="L96">		numOfMines = new int[boardSize][boardSize]; // values for each space (99 = mine)</span>
-<span class="fc" id="L97">		buttons = new JButton[boardSize][boardSize]; // all possible spaces</span>
+<span class="fc" id="L87">		dropdownBox = new JComboBox&lt;&gt;(choices);</span>
+<span class="fc" id="L88">		dropdownBox.setMaximumSize(dropdownBox.getPreferredSize());</span>
+<span class="fc" id="L89">		dropdownBox.setAlignmentX(Component.CENTER_ALIGNMENT);</span>
+<span class="fc" id="L90">		dropdownBox.setSelectedIndex(difficulty);</span>
+<span class="fc" id="L91">		dropdownBox.addActionListener(this);</span>
 
-<span class="fc bfc" id="L99" title="All 2 branches covered.">		for(int i = 0; i &lt; buttons.length; i++){ // create buttons</span>
-<span class="fc bfc" id="L100" title="All 2 branches covered.">			for(int j = 0; j &lt; buttons.length; j++){</span>
-<span class="fc" id="L101">				buttons[i][j] = new JButton(); // current button</span>
-<span class="fc" id="L102">				buttonPanel.add(buttons[i][j]);</span>
-<span class="fc" id="L103">				buttons[i][j].setFont(new Font(&quot;Monospaced&quot;, Font.BOLD, 16));</span>
-<span class="fc" id="L104">				buttons[i][j].setText(&quot;&quot;);</span>
-<span class="fc" id="L105">				buttons[i][j].setBackground(new Color(50,50,50));</span>
-<span class="fc" id="L106">				buttons[i][j].setForeground(new Color(180, 180,180));</span>
-<span class="fc" id="L107">				buttons[i][j].setFocusable(false);</span>
-<span class="fc" id="L108">				buttons[i][j].addActionListener(this);</span>
 
-<span class="fc" id="L110">				int finalI = i;</span>
-<span class="fc" id="L111">				int finalJ = j;</span>
-<span class="fc" id="L112">				buttons[i][j].addMouseListener(new MouseAdapter() {</span>
+<span class="fc" id="L94">		numOfMines = new int[boardSize][boardSize]; // values for each space (99 = mine)</span>
+<span class="fc" id="L95">		buttons = new JButton[boardSize][boardSize]; // all possible spaces</span>
+
+<span class="fc bfc" id="L97" title="All 2 branches covered.">		for(int i = 0; i &lt; buttons.length; i++){ // create buttons</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">			for(int j = 0; j &lt; buttons.length; j++){</span>
+<span class="fc" id="L99">				buttons[i][j] = new JButton(); // current button</span>
+<span class="fc" id="L100">				buttonPanel.add(buttons[i][j]);</span>
+<span class="fc" id="L101">				buttons[i][j].setFont(new Font(&quot;Monospaced&quot;, Font.BOLD, 16));</span>
+<span class="fc" id="L102">				buttons[i][j].setText(&quot;&quot;);</span>
+<span class="fc" id="L103">				buttons[i][j].setBackground(new Color(50,50,50));</span>
+<span class="fc" id="L104">				buttons[i][j].setForeground(new Color(180, 180,180));</span>
+<span class="fc" id="L105">				buttons[i][j].setFocusable(false);</span>
+<span class="fc" id="L106">				buttons[i][j].addActionListener(this);</span>
+
+<span class="fc" id="L108">				int finalI = i;</span>
+<span class="fc" id="L109">				int finalJ = j;</span>
+<span class="fc" id="L110">				buttons[i][j].addMouseListener(new MouseAdapter() {</span>
 					public void mouseClicked(MouseEvent e) {
-<span class="nc bnc" id="L114" title="All 2 branches missed.">						if(e.getButton() == 3) {</span>
-<span class="nc bnc" id="L115" title="All 2 branches missed.">							if(!buttons[finalI][finalJ].getText().equals(&quot;O&quot;)) { // if the space has not been flagged</span>
-<span class="nc" id="L116">								buttons[finalI][finalJ].setForeground(new Color(180, 180,180));</span>
-<span class="nc" id="L117">								buttons[finalI][finalJ].setText(&quot;O&quot;);</span>
-<span class="nc bnc" id="L118" title="All 4 branches missed.">							}else if(buttons[finalI][finalJ].getText().equals(&quot;O&quot;) &amp;&amp; numOfMines[finalI][finalJ] == 99) { // if the space is flagged already and is a mine</span>
-<span class="nc" id="L119">								buttons[finalI][finalJ].setForeground(new Color(50,50,50));</span>
-<span class="nc" id="L120">								buttons[finalI][finalJ].setText(&quot;X&quot;);</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">						if(e.getButton() == 3) {</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">							if(!buttons[finalI][finalJ].getText().equals(&quot;O&quot;)) { // if the space has not been flagged</span>
+<span class="nc" id="L114">								buttons[finalI][finalJ].setForeground(new Color(180, 180,180));</span>
+<span class="nc" id="L115">								buttons[finalI][finalJ].setText(&quot;O&quot;);</span>
+<span class="nc bnc" id="L116" title="All 4 branches missed.">							}else if(buttons[finalI][finalJ].getText().equals(&quot;O&quot;) &amp;&amp; numOfMines[finalI][finalJ] == 99) { // if the space is flagged already and is a mine</span>
+<span class="nc" id="L117">								buttons[finalI][finalJ].setForeground(new Color(50,50,50));</span>
+<span class="nc" id="L118">								buttons[finalI][finalJ].setText(&quot;X&quot;);</span>
 							} else {
-<span class="nc" id="L122">								buttons[finalI][finalJ].setText(&quot;&quot;);</span>
+<span class="nc" id="L120">								buttons[finalI][finalJ].setText(&quot;&quot;);</span>
 							}
 						}
-<span class="nc" id="L125">					}</span>
+<span class="nc" id="L123">					}</span>
 				});
 			}
 		}
 
-<span class="fc" id="L130">		textPanel.add(textField);</span>
-<span class="fc" id="L131">		gameFrame.add(textPanel, BorderLayout.NORTH); // assign 'textPanel' to the north of the Frame!</span>
-<span class="fc" id="L132">		dropdownPanel.add(dropdownText);</span>
-<span class="fc" id="L133">		dropdownPanel.add(dropdownBox);</span>
-<span class="fc" id="L134">		gameFrame.add(dropdownPanel, BorderLayout.SOUTH);</span>
-<span class="fc" id="L135">		gameFrame.add(buttonPanel);</span>
-<span class="fc" id="L136">		gameFrame.setSize(850,850);</span>
-<span class="fc" id="L137">		gameFrame.revalidate();</span>
-<span class="fc" id="L138">		gameFrame.setLocationRelativeTo(null); // centers the frame in the middle of the screen</span>
+<span class="fc" id="L128">		textPanel.add(textField);</span>
+<span class="fc" id="L129">		gameFrame.add(textPanel, BorderLayout.NORTH); // assign 'textPanel' to the north of the Frame!</span>
+<span class="fc" id="L130">		dropdownPanel.add(dropdownText);</span>
+<span class="fc" id="L131">		dropdownPanel.add(dropdownBox);</span>
+<span class="fc" id="L132">		gameFrame.add(dropdownPanel, BorderLayout.SOUTH);</span>
+<span class="fc" id="L133">		gameFrame.add(buttonPanel);</span>
+<span class="fc" id="L134">		gameFrame.setSize(550,550);</span>
+<span class="fc" id="L135">		gameFrame.revalidate();</span>
+<span class="fc" id="L136">		gameFrame.setLocationRelativeTo(null); // centers the frame in the middle of the screen</span>
 
-<span class="fc" id="L140">		getMines();</span>
+<span class="fc" id="L138">		getMines();</span>
 
 
 
-<span class="fc" id="L144">	}</span>
+<span class="fc" id="L142">	}</span>
 
 	public void getMines() {
-<span class="fc bfc" id="L147" title="All 2 branches covered.">		for(int i = 0; i &lt; numOfMines.length; i++){ // current coordinates (x,y)</span>
-<span class="fc bfc" id="L148" title="All 2 branches covered.">			for(int j = 0; j &lt; numOfMines.length; j++){</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">		for(int i = 0; i &lt; numOfMines.length; i++){ // current coordinates (x,y)</span>
+<span class="fc bfc" id="L146" title="All 2 branches covered.">			for(int j = 0; j &lt; numOfMines.length; j++){</span>
 
-<span class="fc" id="L150">				boolean changed = false;</span>
-<span class="fc" id="L151">				int mineTotal = 0;</span>
+<span class="fc" id="L148">				boolean changed = false;</span>
+<span class="fc" id="L149">				int mineTotal = 0;</span>
 
-<span class="fc bfc" id="L153" title="All 2 branches covered.">				for (Point mineCoordinate : mineCoordinates) { // loop through all mine positions</span>
+<span class="fc bfc" id="L151" title="All 2 branches covered.">				for (Point mineCoordinate : mineCoordinates) { // loop through all mine positions</span>
 
-<span class="fc bfc" id="L155" title="All 4 branches covered.">					if (j == mineCoordinate.x &amp;&amp; i == mineCoordinate.y) { //</span>
-<span class="fc" id="L156">						buttons[i][j].setText(&quot;X&quot;);</span>
-<span class="fc" id="L157">						buttons[i][j].setForeground(new Color(50,50,50));</span>
-<span class="fc" id="L158">						numOfMines[i][j] = 99; // sets mines to 99</span>
-<span class="fc" id="L159">						changed = true;</span>
-<span class="fc" id="L160">						break;</span>
+<span class="fc bfc" id="L153" title="All 4 branches covered.">					if (j == mineCoordinate.x &amp;&amp; i == mineCoordinate.y) { //</span>
+<span class="fc" id="L154">						buttons[i][j].setText(&quot;X&quot;);</span>
+<span class="fc" id="L155">						buttons[i][j].setForeground(new Color(50,50,50));</span>
+<span class="fc" id="L156">						numOfMines[i][j] = 99; // sets mines to 99</span>
+<span class="fc" id="L157">						changed = true;</span>
+<span class="fc" id="L158">						break;</span>
 					}
-<span class="fc" id="L162">				}</span>
+<span class="fc" id="L160">				}</span>
 
-<span class="fc bfc" id="L164" title="All 2 branches covered.">				if(!changed) { // if it was not a mine, calculate how many mines are around</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">				if(!changed) { // if it was not a mine, calculate how many mines are around</span>
 
 
 
-<span class="fc bfc" id="L168" title="All 2 branches covered.">					for (Point mineCoordinate : mineCoordinates) { // positions around the location</span>
-<span class="fc bfc" id="L169" title="All 2 branches covered.">						for(int x = -1; x &lt; 2; x++) {</span>
-<span class="fc bfc" id="L170" title="All 2 branches covered.">							for(int y = -1; y &lt; 2; y++) {</span>
-<span class="fc bfc" id="L171" title="All 4 branches covered.">								if(x == 0 &amp;&amp; y == 0) {</span>
-<span class="fc" id="L172">									continue;</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">					for (Point mineCoordinate : mineCoordinates) { // positions around the location</span>
+<span class="fc bfc" id="L167" title="All 2 branches covered.">						for(int x = -1; x &lt; 2; x++) {</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">							for(int y = -1; y &lt; 2; y++) {</span>
+<span class="fc bfc" id="L169" title="All 4 branches covered.">								if(x == 0 &amp;&amp; y == 0) {</span>
+<span class="fc" id="L170">									continue;</span>
 								}
-<span class="fc bfc" id="L174" title="All 4 branches covered.">								if(j + x == mineCoordinate.x &amp;&amp; i + y == mineCoordinate.y ) {</span>
-<span class="fc" id="L175">									mineTotal++;</span>
+<span class="fc bfc" id="L172" title="All 4 branches covered.">								if(j + x == mineCoordinate.x &amp;&amp; i + y == mineCoordinate.y ) {</span>
+<span class="fc" id="L173">									mineTotal++;</span>
 
 								}
 							}
 						}
-<span class="fc" id="L180">						numOfMines[i][j] = mineTotal; // give each space a value</span>
-<span class="fc" id="L181">					}</span>
+<span class="fc" id="L178">						numOfMines[i][j] = mineTotal; // give each space a value</span>
+<span class="fc" id="L179">					}</span>
 				}
 			}
 		}
-<span class="fc bfc" id="L185" title="All 2 branches covered.">		for (int[] numOfMine : numOfMines) { // Prints out board with mine positions</span>
-<span class="fc bfc" id="L186" title="All 2 branches covered.">			for (int b = 0; b &lt; numOfMines.length; b++) {</span>
-<span class="fc" id="L187">				System.out.print(numOfMine[b] + &quot;     &quot;);</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">		for (int[] numOfMine : numOfMines) { // Prints out board with mine positions</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">			for (int b = 0; b &lt; numOfMines.length; b++) {</span>
+<span class="fc" id="L185">				System.out.print(numOfMine[b] + &quot;     &quot;);</span>
 			}
-<span class="fc" id="L189">			System.out.println();</span>
+<span class="fc" id="L187">			System.out.println();</span>
 		}
-<span class="fc" id="L191">		System.out.println();</span>
-<span class="fc" id="L192">	}</span>
+<span class="fc" id="L189">		System.out.println();</span>
+<span class="fc" id="L190">	}</span>
 
 	public void check(int x, int y) { // displays what is at the position clicked on
 
-<span class="nc" id="L196">		boolean isGameOver = false;</span>
+<span class="nc" id="L194">		boolean isGameOver = false;</span>
 
-<span class="nc bnc" id="L198" title="All 4 branches missed.">		if(!buttons[x][y].equals(&quot;O&quot;) &amp;&amp; numOfMines[x][y] == 99) { // bomb is clicked ... oops :(</span>
-<span class="nc" id="L199">			gameOver(false);</span>
-<span class="nc" id="L200">			buttons[x][y].setText(&quot;X&quot;); // if a mine is flagged and clicked the text will convert from a flag to a mine!</span>
-<span class="nc" id="L201">			isGameOver = true;</span>
+<span class="nc bnc" id="L196" title="All 4 branches missed.">		if(!buttons[x][y].equals(&quot;O&quot;) &amp;&amp; numOfMines[x][y] == 99) { // bomb is clicked ... oops :(</span>
+<span class="nc" id="L197">			gameOver(false);</span>
+<span class="nc" id="L198">			buttons[x][y].setText(&quot;X&quot;); // if a mine is flagged and clicked the text will convert from a flag to a mine!</span>
+<span class="nc" id="L199">			isGameOver = true;</span>
 		}
 
-<span class="nc bnc" id="L204" title="All 2 branches missed.">		if(!isGameOver) { // if game is not over</span>
+<span class="nc bnc" id="L202" title="All 2 branches missed.">		if(!isGameOver) { // if game is not over</span>
 
-<span class="nc bnc" id="L206" title="All 2 branches missed.">			if(numOfMines[x][y] == 0) { // if zero spread until bombs are discovered</span>
-<span class="nc" id="L207">				zeroCoordinate.setLocation(x,y);</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">			if(numOfMines[x][y] == 0) { // if zero spread until bombs are discovered</span>
+<span class="nc" id="L205">				zeroCoordinate.setLocation(x,y);</span>
 
-<span class="nc" id="L209">				isZero = true;</span>
-<span class="nc" id="L210">				display();</span>
+<span class="nc" id="L207">				isZero = true;</span>
+<span class="nc" id="L208">				display(zeroCoordinate);</span>
 
 			}
 
-<span class="nc" id="L214">			displayNumbers(x,y);</span>
+<span class="nc" id="L212">			displayNumbers(x,y);</span>
 
-<span class="nc" id="L216">			isWinner();</span>
+<span class="nc" id="L214">			isWinner();</span>
 
 		}
-<span class="nc" id="L219">	}</span>
+<span class="nc" id="L217">	}</span>
 
 	public void gameOver(boolean winner) {
 
-<span class="pc bpc" id="L223" title="1 of 2 branches missed.">		if(winner) {</span>
-<span class="fc" id="L224">			textField.setForeground(Color.GREEN);</span>
-<span class="fc" id="L225">			textField.setText(&quot;You Won!&quot;);</span>
+<span class="pc bpc" id="L221" title="1 of 2 branches missed.">		if(winner) {</span>
+<span class="fc" id="L222">			textField.setForeground(Color.GREEN);</span>
+<span class="fc" id="L223">			textField.setText(&quot;You Won!&quot;);</span>
 		} else {
-<span class="nc" id="L227">			textField.setForeground(Color.RED);</span>
-<span class="nc" id="L228">			textField.setText(&quot;Game Over!&quot;);</span>
+<span class="nc" id="L225">			textField.setForeground(Color.RED);</span>
+<span class="nc" id="L226">			textField.setText(&quot;Game Over!&quot;);</span>
 		}
 
-<span class="fc bfc" id="L231" title="All 2 branches covered.">		for(int i = 0; i &lt; buttons.length; i++) {</span>
-<span class="fc bfc" id="L232" title="All 2 branches covered.">			for(int j = 0; j &lt; buttons.length; j++) { // loop through and disable the board</span>
-<span class="fc" id="L233">				buttons[i][j].setEnabled(false);</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">		for(int i = 0; i &lt; buttons.length; i++) {</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">			for(int j = 0; j &lt; buttons.length; j++) { // loop through and disable the board</span>
+<span class="fc" id="L231">				buttons[i][j].setEnabled(false);</span>
 
 			}
 		}
-<span class="fc" id="L237">	}</span>
+<span class="fc" id="L235">	}</span>
 
 	public void isWinner() {
-<span class="nc" id="L240">		int spaces = 0;</span>
+<span class="nc" id="L238">		int spaces = 0;</span>
 
-<span class="nc bnc" id="L242" title="All 2 branches missed.">		for(int i = 0; i &lt; buttons.length; i++) {</span>
-<span class="nc bnc" id="L243" title="All 2 branches missed.">			for(int j = 0; j &lt; buttons.length; j++) { // loop through and disable the board</span>
-<span class="nc bnc" id="L244" title="All 2 branches missed.">				if(buttons[i][j].getText().isEmpty()) {</span>
-<span class="nc" id="L245">					spaces++; // increases for all remaining buttons</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">		for(int i = 0; i &lt; buttons.length; i++) {</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">			for(int j = 0; j &lt; buttons.length; j++) { // loop through and disable the board</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">				if(buttons[i][j].getText().isEmpty()) {</span>
+<span class="nc" id="L243">					spaces++; // increases for all remaining buttons</span>
 				}
 
 			}
 		}
-<span class="nc bnc" id="L250" title="All 2 branches missed.">		if(spaces == 0) { // if the remaining spaces count equal the bomb count then the player wins</span>
-<span class="nc" id="L251">			gameOver(true);</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">		if(spaces == 0) { // if the remaining spaces count equal the bomb count then the player wins</span>
+<span class="nc" id="L249">			gameOver(true);</span>
 		}
-<span class="nc" id="L253">	}</span>
+<span class="nc" id="L251">	}</span>
 
 	public void displayNumbers(int x, int y) { // after clicking a non-mine space, the specific number will appear depending on bomb location
-<span class="nc bnc" id="L256" title="All 2 branches missed.">		if(buttons[x][y].getText().isEmpty()) { // prevents bombs and flagged being displayed</span>
-<span class="nc" id="L257">			buttons[x][y].setForeground(new Color(255, 165, 0));</span>
-<span class="nc" id="L258">			buttons[x][y].setBackground((new Color(70, 70, 70)));</span>
-<span class="nc" id="L259">			buttons[x][y].setText(String.valueOf(numOfMines[x][y]));</span>
-<span class="nc" id="L260">			buttons[x][y].setEnabled(false);</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">		if(numOfMines[x][y] != 99) {</span>
+<span class="nc" id="L255">			buttons[x][y].setForeground(new Color(255, 165, 0));</span>
+<span class="nc" id="L256">			buttons[x][y].setBackground((new Color(70, 70, 70)));</span>
+<span class="nc" id="L257">			buttons[x][y].setText(String.valueOf(numOfMines[x][y]));</span>
+<span class="nc" id="L258">			buttons[x][y].setEnabled(false);</span>
 		}
-<span class="nc" id="L262">	}</span>
+<span class="nc" id="L260">	}</span>
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// Load chosen difficulty depending on dropdown box choice
-<span class="nc bnc" id="L267" title="All 2 branches missed.">		if(e.getSource() == dropdownBox) {</span>
-<span class="nc bnc" id="L268" title="All 2 branches missed.">			if(dropdownBox.getSelectedItem() == &quot;Easy&quot;) {</span>
-<span class="nc" id="L269">				gameFrame.dispose();</span>
-<span class="nc" id="L270">				new Game(6, 10, 0);</span>
-<span class="nc" id="L271">				dropdownBox.setSelectedIndex(0);</span>
-<span class="nc bnc" id="L272" title="All 2 branches missed.">			} else if (dropdownBox.getSelectedItem() == &quot;Medium&quot;) {</span>
-<span class="nc" id="L273">				gameFrame.dispose();</span>
-<span class="nc" id="L274">				new Game(8, 20, 1);</span>
-<span class="nc" id="L275">				dropdownBox.setSelectedIndex(1);</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">		if(e.getSource() == dropdownBox) {</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">			if(dropdownBox.getSelectedItem() == &quot;Easy&quot;) {</span>
+<span class="nc" id="L267">				gameFrame.dispose();</span>
+<span class="nc" id="L268">				new Game(6, 10, 0);</span>
+<span class="nc" id="L269">				dropdownBox.setSelectedIndex(0);</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">			} else if (dropdownBox.getSelectedItem() == &quot;Medium&quot;) {</span>
+<span class="nc" id="L271">				gameFrame.dispose();</span>
+<span class="nc" id="L272">				new Game(8, 20, 1);</span>
+<span class="nc" id="L273">				dropdownBox.setSelectedIndex(1);</span>
 
 			} else {
-<span class="nc" id="L278">				gameFrame.dispose();</span>
-<span class="nc" id="L279">				new Game(10, 30, 2);</span>
-<span class="nc" id="L280">				dropdownBox.setSelectedIndex(2);</span>
+<span class="nc" id="L276">				gameFrame.dispose();</span>
+<span class="nc" id="L277">				new Game(10, 30, 2);</span>
+<span class="nc" id="L278">				dropdownBox.setSelectedIndex(2);</span>
 
 			}
 		}else {
 			// Display position clicked on
-<span class="nc bnc" id="L285" title="All 2 branches missed.">			for (int i = 0; i &lt; buttons.length; i++) {</span>
-<span class="nc bnc" id="L286" title="All 2 branches missed.">				for (int j = 0; j &lt; buttons.length; j++) {</span>
-<span class="nc bnc" id="L287" title="All 2 branches missed.">					if (e.getSource() == buttons[i][j]) {</span>
-<span class="nc" id="L288">						check(i, j);</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">			for (int i = 0; i &lt; buttons.length; i++) {</span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">				for (int j = 0; j &lt; buttons.length; j++) {</span>
+<span class="nc bnc" id="L285" title="All 2 branches missed.">					if (e.getSource() == buttons[i][j]) {</span>
+<span class="nc" id="L286">						check(i, j);</span>
 					}
 				}
 			}
@@ -294,86 +292,62 @@ public class Game implements ActionListener {
 
 
 
-<span class="nc" id="L297">	}</span>
+<span class="nc" id="L295">	}</span>
 
-	public void display() {
+	public void display(Point zeroCoordinate) {
 
-<span class="nc bnc" id="L301" title="All 2 branches missed.">		if(isZero) {</span>
-<span class="nc bnc" id="L302" title="All 2 branches missed.">			for(int x = -1;  x &lt; 2; x++) {</span>
-<span class="nc bnc" id="L303" title="All 2 branches missed.">				for(int y = -1; y &lt; 2; y++) { // check if space is in bounds first</span>
-<span class="nc bnc" id="L304" title="All 8 branches missed.">					if((zeroCoordinate.x+x) &gt; 0 &amp;&amp; (zeroCoordinate.y+y) &gt; 0 &amp;&amp;</span>
-							(zeroCoordinate.x+x) &lt; boardSize &amp;&amp; (zeroCoordinate.y+y &lt; boardSize)  )
-<span class="nc" id="L306">						displayNumbers(zeroCoordinate.x + x, zeroCoordinate.y + y);</span>
-				}
-			}
-<span class="nc" id="L309">				isZero = false;</span>
-<span class="nc" id="L310">				display(); // calls itself to trigger the else</span>
-		} else {
-
-<span class="nc bnc" id="L313" title="All 2 branches missed.">			for(int i = 0; i &lt; buttons.length; i++) { // loop through all spaces</span>
-<span class="nc bnc" id="L314" title="All 2 branches missed.">				for(int j = 0; j &lt; buttons.length; j++) {</span>
-
-<span class="nc bnc" id="L316" title="All 2 branches missed.">					if(buttons[i][j].getText().equals(&quot;0&quot;)) {</span>
-<span class="nc bnc" id="L317" title="All 2 branches missed.">						if(i-1 &gt;= 0) {</span>
-<span class="nc bnc" id="L318" title="All 2 branches missed.">							if(buttons[i - 1][j].getText().isEmpty()) {</span>
-<span class="nc" id="L319">								lastCheckCoordinate.setLocation(i,j);</span>
-							}
-						}
-
-<span class="nc bnc" id="L323" title="All 2 branches missed.">						if(i+1 &lt; boardSize) {</span>
-<span class="nc bnc" id="L324" title="All 2 branches missed.">							if(buttons[i + 1][j].getText().isEmpty()) {</span>
-<span class="nc" id="L325">								lastCheckCoordinate.setLocation(i,j);</span>
-							}
-						}
-
-<span class="nc bnc" id="L329" title="All 2 branches missed.">						if(j-1 &gt;= 0) {</span>
-<span class="nc bnc" id="L330" title="All 2 branches missed.">							if(buttons[i][j - 1].getText().isEmpty()) {</span>
-<span class="nc" id="L331">								lastCheckCoordinate.setLocation(i,j);</span>
-							}
-						}
-
-<span class="nc bnc" id="L335" title="All 2 branches missed.">						if(j+1 &lt; boardSize) {</span>
-<span class="nc bnc" id="L336" title="All 2 branches missed.">							if(buttons[i][j + 1].getText().isEmpty()) {</span>
-<span class="nc" id="L337">								lastCheckCoordinate.setLocation(i,j);</span>
-							}
-						}
-
-<span class="nc bnc" id="L341" title="All 4 branches missed.">						if(i-1 &gt;= 0 &amp;&amp; j-1 &gt;= 0) {</span>
-<span class="nc bnc" id="L342" title="All 2 branches missed.">							if(buttons[i - 1][j - 1].getText().isEmpty()) {</span>
-<span class="nc" id="L343">								lastCheckCoordinate.setLocation(i,j);</span>
-							}
-						}
-
-<span class="nc bnc" id="L347" title="All 4 branches missed.">						if(i+1 &lt; boardSize &amp;&amp; j+1 &lt; boardSize) {</span>
-<span class="nc bnc" id="L348" title="All 2 branches missed.">							if(buttons[i + 1][j + 1].getText().isEmpty()) {</span>
-<span class="nc" id="L349">								lastCheckCoordinate.setLocation(i,j);</span>
-							}
-						}
-
-<span class="nc bnc" id="L353" title="All 4 branches missed.">						if(i+1 &lt; boardSize &amp;&amp; j-1 &gt;= 0) {</span>
-<span class="nc bnc" id="L354" title="All 2 branches missed.">							if(buttons[i + 1][j - 1].getText().isEmpty()) {</span>
-<span class="nc" id="L355">								lastCheckCoordinate.setLocation(i,j);</span>
-							}
-						}
-
-<span class="nc bnc" id="L359" title="All 4 branches missed.">						if(i-1 &gt;= 0 &amp;&amp; j+1 &lt; boardSize) {</span>
-<span class="nc bnc" id="L360" title="All 2 branches missed.">							if(buttons[i - 1][j + 1].getText().isEmpty()) {</span>
-<span class="nc" id="L361">								lastCheckCoordinate.setLocation(i,j);</span>
-							}
-						}
+<span class="nc bnc" id="L299" title="All 2 branches missed.">		if(isZero) { // if the position = 0 (true)</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">			for(int x = -1;  x &lt; 2; x++) {</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">				for (int y = -1; y &lt; 2; y++) { // check if space is in bounds first</span>
+<span class="nc bnc" id="L302" title="All 8 branches missed.">					if ((zeroCoordinate.x + x) &gt;= 0 &amp;&amp; (zeroCoordinate.y + y) &gt;= 0 &amp;&amp;</span>
+							(zeroCoordinate.x + x) &lt; boardSize &amp;&amp; (zeroCoordinate.y + y &lt; boardSize)) {
+<span class="nc" id="L304">						System.out.println(zeroCoordinate.x + x);</span>
+<span class="nc" id="L305">						displayNumbers(zeroCoordinate.x + x, zeroCoordinate.y + y);</span>
 					}
 				}
 			}
-
 		}
 
-<span class="nc bnc" id="L370" title="All 4 branches missed.">		if(lastCheckCoordinate.x &lt; boardSize + 1 &amp;&amp; lastCheckCoordinate.y &lt; boardSize + 1) { // less than default values</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">		for(int i = 0; i &lt; buttons.length; i++) { // loop through all spaces</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">			for(int j = 0; j &lt; buttons.length; j++) {</span>
 
-<span class="nc" id="L372">			zeroCoordinate.setLocation(lastCheckCoordinate);</span>
-<span class="nc" id="L373">			isZero = true; // make display run the if statement again!</span>
-<span class="nc" id="L374">			lastCheckCoordinate.setLocation(boardSize+1,boardSize+1); // reset original values</span>
-<span class="nc" id="L375">			display(); // iterates through the loop again (chain reaction when zeros are found on the board)</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">				if(buttons[i][j].getText().equals(&quot;0&quot;)) { // check if the space has a zero</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">					if(i-1 &gt;= 0) { // check to see in scope</span>
+<span class="nc" id="L316">						displayNumbers(i-1,j);</span>
+					}
+
+<span class="nc bnc" id="L319" title="All 2 branches missed.">					if(i+1 &lt; boardSize) {</span>
+<span class="nc" id="L320">						displayNumbers(i+1,j);</span>
+					}
+
+<span class="nc bnc" id="L323" title="All 2 branches missed.">					if(j-1 &gt;= 0) {</span>
+<span class="nc" id="L324">						displayNumbers(i,j-1);</span>
+					}
+
+<span class="nc bnc" id="L327" title="All 2 branches missed.">					if(j+1 &lt; boardSize) {</span>
+<span class="nc" id="L328">						displayNumbers(i,j+1);</span>
+					}
+
+<span class="nc bnc" id="L331" title="All 4 branches missed.">					if(i-1 &gt;= 0 &amp;&amp; j-1 &gt;= 0) {</span>
+<span class="nc" id="L332">						displayNumbers(i-1,j-1);</span>
+					}
+
+<span class="nc bnc" id="L335" title="All 4 branches missed.">					if(i+1 &lt; boardSize &amp;&amp; j+1 &lt; boardSize) {</span>
+<span class="nc" id="L336">						displayNumbers(i+1,j+1);</span>
+					}
+
+<span class="nc bnc" id="L339" title="All 4 branches missed.">					if(i+1 &lt; boardSize &amp;&amp; j-1 &gt;= 0) {</span>
+<span class="nc" id="L340">						displayNumbers(i+1,j-1);</span>
+					}
+
+<span class="nc bnc" id="L343" title="All 4 branches missed.">					if(i-1 &gt;= 0 &amp;&amp; j+1 &lt; boardSize) {</span>
+<span class="nc" id="L344">						displayNumbers(i-1,j+1);</span>
+					}
+				}
+			}
 		}
-<span class="nc" id="L377">	}</span>
+<span class="nc" id="L349">	}</span>
+
+
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
